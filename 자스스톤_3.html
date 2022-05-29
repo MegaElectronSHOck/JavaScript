@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #my, #rival {
+            display: inline-block;
+            vertical-align: top;
+            margin-right: 50px;
+        }
+        .turn {
+            border: 1px solid blue;
+        }
+        #rival {
+            vertical-align: bottom;
+        }
+        #my-deck, #rival-deck {
+            display: inline-block;
+            vertical-align: top;
+            width: 300px;
+            background: silver;
+        }
+        #rival-deck, #rival-hero, #rival-cards, #my-cards, #my-deck, #my-hero {
+            text-align: center;
+        }
+        .card {
+            width: 75px;
+            height: 120px;
+            display: inline-block;
+            position: relative;
+            border: 1px solid black;
+            margin-bottom: 10px;
+            background: white;
+        }
+        .card-name {
+            text-align: center;
+            font-size: 14px;
+        }
+        .card-att, .card-hp, .card-cost {
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            line-height: 30px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-block;
+            position: absolute;
+            bottom: 0;
+            border: 1px solid black;
+        }
+        .card-cost {
+            bottom: auto;
+            top: 0;
+            left: 0;
+            background-color: blue;
+            color: white;
+        }
+        .card-att {
+            left: 0;
+            background-color: yellow;
+        }
+        .card-hp {
+            right: 0;
+            background-color: red;
+            color: white;
+        }
+        .card-hidden {
+            display: none;
+        }
+        .card-selected {
+            border: 2px solid red;
+        }
+        .card-turnover {
+            background: gray;
+        }
+        #turn-btn {
+            float: right;
+            position: relative;
+            top: -23px;
+        }
+    </style>
+</head>
+<body>
+    <div id='rival'>
+        <div> 코스트 : <span id='rival-cost'>10</span> / <span>10</span></div>
+        <div id='rival-hero'></div>
+        <div id='rival-cards' style='height:150px;'></div>
+    </div>
+    <div id='rival-deck'>
+        <div>상대덱</div>
+    </div>
+    <hr />
+    <button id='turn-btn'>턴넘기기</button>
+    <div id='my' class='turn'>
+        <div id='my-cards' style='height:150px;'></div>
+        <div id='my-hero'></div>
+        <div>코스트 : <span id='my-cost'>10</span> / <span>10</span></div>
+    </div>
+    <div id='my-deck'>
+        <div>내덱</div>
+    </div>
+    <div class="card-hidden">
+        <div class="card">
+            <div class="card-cost"></div>
+            <div class="card-att"></div>
+            <div class="card-hp"></div>
+        </div>
+    </div>
+
+    <script>
+        const 나 = {
+            덱 : document.querySelector('#my-deck'),
+            덱data : [],
+            영웅 : document.querySelector('#my-hero'),
+            영웅data : null,
+            필드 : document.querySelector('#my-cards'),
+            필드data : [],
+            선택카드 : null,
+            선택카드data : null,
+            코스트 : document.querySelector('#my-cost')
+        }
+
+        const 상대 = {
+            덱 : document.querySelector('#rival-deck'),
+            덱data : [],
+            영웅 : document.querySelector('#rival-hero'),
+            영웅data : null,
+            필드 : document.querySelector("#rival-cards"),
+            필드data : [],
+            선택카드 : null,
+            선택카드data : null,
+            코스트 : document.querySelector('#rival-cost')
+
+        }
+
+        let 턴 = true;
+
+        function 필드다시그리기(객체){
+            객체.필드.innerHTML = '';
+            객체.필드data.forEach((data)=>{
+                카드돔연결(data, 객체.필드)
+            })
+        }
+
+        function 덱다시그리기(객체){
+            객체.덱.innerHTML = '';
+            객체.덱data.forEach((data)=>{
+                카드돔연결(data, 객체.덱)
+            })
+        }
+
+        function 영웅다시그리기(객체){
+            객체.영웅.innerHTML = '';
+            카드돔연결(객체.영웅data, 객체.영웅, true)
+        }
+
+        function 덱에서필드로(데이터, 내턴){
+            let 객체 = 내턴 ? 나 : 상대;
+            let 인덱스 = 객체.덱data.indexOf(데이터);
+            let 현재코스트 = Number(객체.코스트.textContent);
+            
+            if(데이터.cost > 현재코스트){
+                return true;
+            }
+            객체.덱data.splice(인덱스, 1);
+            객체.필드data.push(데이터);
+            
+            데이터.field = true;
+            객체.코스트.textContent = 현재코스트 - 데이터.cost
+            덱다시그리기(객체)
+            필드다시그리기(객체)
+
+        }
+        function 턴액션수행(카드, 데이터, 내턴){
+             let 아군 = 내턴 ? 나 : 상대;
+             let 적군 = 내턴 ? 상대 : 나;
+             let 적군카드 = 내턴 ? !데이터.mine : 데이터.mine
+             if(카드.classList.contains('card-turnover')){
+                        return;
+                    }
+                    if(적군카드 && 아군.선택카드 && 데이터.field){
+                        데이터.hp = 데이터.hp - 아군.선택카드data.att;
+                        카드.querySelector('.card-hp').textContent = 데이터.hp;
+                        if(데이터.hp <= 0){
+                            
+                            let 인덱스 = 적군.필드data.indexOf(데이터);
+                            if(인덱스 >= 0){
+                                적군.필드data.splice(인덱스,1);
+                            필드다시그리기(적군)
+                            }else{
+                               alert('승리');
+                               초기셋팅();
+                               return;
+                            }
+                            
+                        }
+                        아군.선택카드.classList.remove('card-selected');
+                        아군.선택카드.classList.add('card-turnover');
+                        아군.선택카드 = null;
+                        아군.선택카드data = null;
+                        return;
+                    }else if(적군카드){
+                        return;
+                    }
+
+                    if(데이터.field){
+                        카드.parentNode.querySelectorAll('.card').forEach((card)=>{
+                            card.classList.remove('card-selected');
+                        })
+                        카드.classList.add('card-selected');
+                        아군.선택카드 = 카드;
+                        아군.선택카드data = 데이터;
+                    }else{
+                        if(!덱에서필드로(데이터, 내턴)){
+                           내턴 ? 내덱생성(1) : 상대덱생성(1)
+                        }
+                    }
+                    //
+        }
+        function 카드돔연결(데이터, 돔, 영웅){
+            let 카드 = document.querySelector('.card-hidden > .card').cloneNode(true);
+            카드.querySelector('.card-att').textContent = 데이터.att;
+            카드.querySelector('.card-cost').textContent = 데이터.cost;
+            카드.querySelector('.card-hp').textContent = 데이터.hp;
+
+            if(영웅){
+                카드.querySelector('.card-cost').style.display = 'none';
+                let 이름 = document.createElement('div');
+                이름.textContent = '영웅'
+                카드.appendChild(이름)
+            }
+
+            카드.addEventListener('click',()=>{
+               턴액션수행(카드, 데이터, 턴)
+            })
+            돔.appendChild(카드);
+        }
+
+        function 내덱생성(갯수){
+            for(let i = 0; i < 갯수; i++){
+                나.덱data.push(카드공장(false, true))
+            }
+            덱다시그리기(나)
+        }
+
+        function 상대덱생성(갯수){
+            for(let i = 0; i < 갯수; i++){
+                상대.덱data.push(카드공장(false, false));
+            }
+            덱다시그리기(상대)
+        }
+
+        function 내영웅생성(){
+            나.영웅data = 카드공장(true, true);
+            영웅다시그리기(나)
+        }
+
+        function 상대영웅생성(){
+            상대.영웅data = 카드공장(true, false);
+            영웅다시그리기(상대)
+        }
+
+        function Card(영웅, 내카드){
+            if(영웅){
+                this.att = Math.ceil(Math.random()*5);
+                this.hp = Math.ceil(Math.random()*5)+25;
+                this.field = true;
+            }else{
+                this.att = Math.ceil(Math.random()*5);
+                this.hp = Math.ceil(Math.random()*5);
+                this.cost = Math.floor((this.att+this.hp)/2);
+            }
+
+            if(내카드){
+                this.mine = true;
+            }
+            
+        }
+
+        function 카드공장(영웅, 내카드){
+            return new Card(영웅, 내카드);
+        }
+
+        function 초기셋팅(){
+            [상대, 나].forEach((item)=>{
+                item.덱data = [];
+                item.필드data = [];
+                item.영웅data = [];
+                item.선택카드 = null;
+                item.선택카드data = null;
+                item.필드.innerHTML = '';
+                item.코스트.textContent = 10;
+            })
+
+            내덱생성(5);
+            상대덱생성(5);
+            내영웅생성();
+            상대영웅생성();
+
+        }
+        document.querySelector('#turn-btn').addEventListener('click',()=>{
+            let 객체 = 턴 ? 나 : 상대;
+            document.querySelector('#my').classList.toggle('turn')
+            document.querySelector('#rival').classList.toggle('turn');
+            객체.코스트.textContent = 10;
+            필드다시그리기(객체)
+            영웅다시그리기(객체)
+            턴 = !턴;
+        })
+        초기셋팅();
+    </script>
+</body>
+</html>

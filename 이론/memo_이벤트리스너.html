@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        // 이벤트 연결
+        var bt = document.getElementById('bt');
+        bt.onclick = function (){  // 첫번째
+            alert('클릭했습니다')
+        }
+
+        function view(){
+            alert('클릭했습니다.')
+        }
+
+        bt.onclick = function(){ // 두번째 -> bt.onclick() 을 같이 쓰면 bt.onclick이 클릭하지 않아도 강제 실행된다.
+            view();
+        }
+
+        bt.onclick = view // 3번째
+
+
+        // 이벤트 리스너
+        window.onload = function () { // script가 윗부분에 있을때 onload되면 실행하라
+            var bt = document.getElementById('bt');
+            bt.onclick = function (){
+                alert('클릭했습니다.')
+            }
+        }
+        // window.onload는 마지막에 있는것 한번만 실행된다. window라는 객체에 대해서 한번만 실행된다.
+
+        function loadEnd1 () {
+            alert('실행1')
+        }
+
+        if(window.attachEvent){ // (구형 익스플로러) attachEvent라는 놈을 지원하면 -> 익스플로러에서 지원 - 브라우저가 익스플로러면 
+            window.attachEvent('onload',loadEnd1) // 구형 익스플로러에서 사용 
+        }else{
+            window.addEventListener('load', loadEnd1) // 주로 사용
+        }
+        
+
+        //이벤트 객체
+        bt.onclick = function (event){
+            event.target; // 이벤트를 발생시킨 객체 리턴
+            event.type // 이벤트 이름 리턴
+            event.clientX // 이벤트가 발생된 x좌표 (브라우저 기준)
+            event.clientY // 이벤트가 발생된 Y좌표 (브라우저 기준)
+            event.screenX // 이벤트가 발생된 x좌표 (화면 기준)
+            event.screenY // 이벤트가 발생된 y좌표 (화면 기준)
+            event.button //마우스의 버튼값 리턴 (왼쪽/ 가운데/ 오른쪽) -> 0,1,2 로 출력
+
+            var txt = document.getElementById('txt'); // 텍스트 타입 input
+
+            txt.onkeydown =  function (event){ // 키보드의 키를 눌렀을때 함수 실행
+                // ctrlKey , shiftKey 등등
+                if(event.altKey){ // alt키를 눌렀을때
+                        alert('alt 키를 눌렀을때')
+                }
+            }
+
+        // e.preventDefault : 기본 이벤트 방지;
+
+        // this 
+        bt.onclick = function(){
+            this.style.background = 'red'; // this 는 bt를 가리킴
+        }
+
+        // 창 열기 닫기
+        bt.onclick = function (){
+            winOpen();
+        }
+        bt.onclick = function (){
+            windClose();
+        }
+
+        function winOpen(){
+            win = window.open('http://naver.com', 'naver', 'width=300, height=300, left=100, top=100')
+            // ('주소', '창제목', '옵션=값')
+        }
+
+        function winClose(){
+            win.close(); // 브라우저 닫기
+        }
+
+       
+        }
+    </script>
+</body>
+</html>

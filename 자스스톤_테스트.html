@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #my, #rival {
+            display: inline-block;
+            vertical-align: top;
+            margin-right: 50px;
+        }
+        .turn {
+            border: 1px solid blue;
+        }
+        #rival {
+            vertical-align: bottom;
+        }
+        #my-deck, #rival-deck {
+            display: inline-block;
+            vertical-align: top;
+            width: 300px;
+            background: silver;
+        }
+        #rival-deck, #rival-hero, #rival-cards, #my-cards, #my-deck, #my-hero {
+            text-align: center;
+        }
+        .card {
+            width: 75px;
+            height: 120px;
+            display: inline-block;
+            position: relative;
+            border: 1px solid black;
+            margin-bottom: 10px;
+            background: white;
+        }
+        .card-name {
+            text-align: center;
+            font-size: 14px;
+        }
+        .card-att, .card-hp, .card-cost {
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            line-height: 30px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-block;
+            position: absolute;
+            bottom: 0;
+            border: 1px solid black;
+        }
+        .card-cost {
+            bottom: auto;
+            top: 0;
+            left: 0;
+            background-color: blue;
+            color: white;
+        }
+        .card-att {
+            left: 0;
+            background-color: yellow;
+        }
+        .card-hp {
+            right: 0;
+            background-color: red;
+            color: white;
+        }
+        .card-hidden {
+            display: none;
+        }
+        .card-selected {
+            border: 2px solid red;
+        }
+        .card-turnover {
+            background: gray;
+        }
+        #turn-btn {
+            float: right;
+            position: relative;
+            top: -23px;
+        }
+    </style>
+</head>
+<body>
+    <div id="rival">
+        <div>코스트 : <span id="rival-cost">10</span>/<span>10</span></div>
+        <div id="rival-hero"></div>
+        <div id="rival-cards" style='height:150px;'></div>
+    </div>
+    <div id="rival-deck"><div>덱</div></div>
+    <hr/>
+    <button id="turn-btn">턴넘기기</button>
+    <div id="my" class='turn'>
+        <div id="my-cards" style='height:150px;'></div>
+        <div id="my-hero"></div>
+        <div>코스트 : <span id="my-cost">10</span>/<span>10</span></div>
+    </div>
+    <div id="my-deck">
+        <div>덱</div>
+    </div>
+    <div class="card-hidden">
+        <div class="card">
+            <div class="card-cost"></div>
+            <div class="card-att"></div>
+            <div class="card-hp"></div>
+        </div>
+    </div>
+    <script>
+        const my = {
+            hero : document.getElementById('my-hero'),
+            field : document.getElementById('my-cards'),
+            deck : document.getElementById('my-deck'),
+            hero_data : [],
+            field_data : [],
+            deck_data : [],
+            selected_card : null,
+            selected_card_data : null,
+            cost : document.getElementById('my-cost')
+        }
+        const rival = {
+            hero : document.getElementById('rival-hero'),
+            field : document.getElementById('rival-cards'),
+            deck : document.getElementById('rival-deck'),
+            hero_data : [],
+            field_data : [],
+            deck_data : [],
+            selected_card : null,
+            selected_card_data : null,
+            cost : document.getElementById('rival-cost')
+        }
+        const turn_button = document.querySelector('#turn-btn');
+        let turn = true;
+        const goToField = (card, data, my_turn) => {
+            const obj = my_turn ? my : rival;
+            const idx = obj.deck_data.indexOf(data);
+            const now_cost = Number(obj.cost.textContent);
+            if(now_cost < data.cost){
+                return false;
+            }   
+            obj.deck_data.splice(idx, 1);
+            obj.field_data.push(data);
+            data.field = true;
+            deck_reDraw(obj)
+            field_reDraw(obj);
+            obj.cost.textContent = now_cost -data.cost;
+        }
+
+        const turn_action = (card, data, my_turn) => {
+            const my_side = my_turn ? my : rival;
+            const your_side = my_turn ? rival : my;
+            if(card.classList.contains('card-turnover')){
+                console.log('끝')
+                return;
+            }
+            const enemy_card = my_turn ? !data.mine : data.mine;
+            if(enemy_card && my_side.selected_card){
+                data.hp = data.hp - my_side.selected_card_data.att;
+                if(data.hp <= 0){
+                    const idx = your_side.field_data.indexOf(data);
+                    if(idx >= 0){
+                    your_side.field_data.splice(idx, 1);
+                    }else{
+                        console.log('게임끝')
+                    }
+                }
+                my_side.selected_card.classList.remove('card-selected');
+                my_side.selected_card.classList.add('card-turnover');
+                // my_side.selected_card_data = null;
+                // my_side.selected_card = null;
+                field_reDraw(your_side)
+                return;
+            }else if(enemy_card){
+                return;
+            }
+
+            if(data.field){
+                document.querySelectorAll('.card').forEach((c)=>{
+                    c.classList.remove('card-selected');
+                })
+                card.classList.add('card-selected');
+                my_side.selected_card = card;
+                my_side.selected_card_data = data;
+            }else{
+            if(goToField(card, data, my_turn) !== false){
+                my_turn ? generate_myDeck(1) : generate_rivalDeck(1)
+            }
+            }
+        }
+
+        const card_dom_link = (data, dom, isHero) => {
+            const card = document.querySelector('.card-hidden .card').cloneNode(true);
+            card.querySelector('.card-cost').textContent = data.cost;
+            card.querySelector('.card-att').textContent = data.att;
+            card.querySelector('.card-hp').textContent = data.hp;
+            if(isHero){
+                card.querySelector('.card-cost').style.display = 'none';
+                const name = document.createElement('div');
+                name.textContent = '영웅';
+                card.appendChild(name)
+
+            }
+            card.addEventListener('click', () => {
+                turn_action(card, data, turn)
+            })
+            dom.appendChild(card)
+        }
+        const field_reDraw = (obj) => {
+            obj.field.innerHTML = '';
+            obj.field_data.forEach((data) => {
+                card_dom_link(data, obj.field)
+            })
+        }
+
+        const deck_reDraw = (obj) => {
+            obj.deck.innerHTML = '';
+            obj.deck_data.forEach((data) => {
+                card_dom_link(data, obj.deck)
+            })
+        }
+
+        const hero_reDraw = (obj) => {
+            obj.hero.innerHTML = '';
+            card_dom_link(obj.hero_data, obj.hero, true)
+        }
+        const generate_myHero = () => {
+            my.hero_data = card_factory(true, true);
+            hero_reDraw(my);
+        }
+        const generate_rivalHero = () => {
+            rival.hero_data = card_factory(true, false);
+            hero_reDraw(rival)
+        }
+
+        const generate_myDeck = (count) => {
+            for(let i =0; i < count; i++){
+                my.deck_data.push(card_factory(false, true))
+            }
+            deck_reDraw(my)
+        }
+
+        const generate_rivalDeck = (count) => {
+            for(let i =0; i < count; i++){
+                rival.deck_data.push(card_factory())
+            }
+            deck_reDraw(rival)
+        }
+
+        const card_factory = (hero, my_card) => {
+            return new Card(hero, my_card)
+        }
+
+        function Card(hero, my_card){
+            if(hero){
+                this.att = Math.ceil(Math.random()*5);
+                // this.hp = Math.ceil(Math.random()*5) + 25;
+                this.hp = 1
+                this.hero = true;
+                this.field = true;
+            }else{
+                this.att = Math.ceil(Math.random()*5);
+                this.hp = Math.ceil(Math.random()*5);
+                this.cost = Math.floor((this.att + this.hp)/2);
+            }
+            if(my_card){
+                this.mine = true;
+            }
+
+        }
+
+        const init = () => {
+            generate_myDeck(5);
+            generate_rivalDeck(5);
+            generate_myHero();
+            generate_rivalHero();
+        }
+
+        init();
+        turn_button.addEventListener('click',() => {
+            turn = !turn
+            console.log(turn)
+        })
+    </script>
+</body>
+</html>

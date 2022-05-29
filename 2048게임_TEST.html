@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #table{
+            border-collapse:collapse;
+            user-select:none;
+        }
+        #table td{
+            width: 150px;
+            height: 150px;
+            border:1px solid black;
+            font-size: 30px;
+            font-weight: bold;
+            text-align:center;
+        }
+        #score{
+            user-select:none;
+        }
+    </style>
+</head>
+<body>
+    <table id='table'></table>
+    <div id='score'>0</div>
+    
+    <script>
+        let 구조데이터 = [1,2,3,4];
+        let 테이블 = document.getElementById('table');
+        let 점수표 = document.getElementById('score');
+        let 데이터 = [];
+        
+        function 초기화 (){
+        //  테이블.innerHTML = ''
+             
+       
+            let fragment = document.createDocumentFragment();
+           
+            구조데이터.forEach(()=>{
+                let tr = document.createElement('tr');
+                let 열데이터 = [];
+                데이터.push(열데이터);
+                구조데이터.forEach(()=>{
+                    let td = document.createElement('td');
+                    tr.appendChild(td);
+                    열데이터.push(0);
+                })
+                fragment.appendChild(tr)    
+            })
+           
+            테이블.appendChild(fragment)
+            
+            랜덤생성();
+        }
+        
+        function 랜덤생성(){ 
+            
+            let 빈칸배열 = [];
+            데이터.forEach((열데이터, i)=>{
+                열데이터.forEach((행데이터,j)=>{
+                    if(!행데이터){
+                    빈칸배열.push([i,j])
+                    }
+                })
+            })
+            if(빈칸배열.length > 0){
+                let 랜덤칸 = 빈칸배열[Math.floor(Math.random()*빈칸배열.length)];
+            데이터[랜덤칸[0]][랜덤칸[1]] = 2;
+            그리기();
+            }else{
+                if(confirm('게임종료')){
+                    초기화();
+                }
+            }
+           
+        }
+
+        function 그리기(){
+           
+            데이터.forEach((열데이터,i)=>{
+                열데이터.forEach((행데이터,j)=>{
+
+                    if(행데이터){
+                    테이블.children[i].children[j].textContent = 행데이터;
+                    }else{
+                    테이블.children[i].children[j].textContent = '';
+                    }
+                })
+            })
+        }
+
+        초기화();
+
+        let 마우스시작, 마우스중 = false;
+        let 시작좌표, 끝좌표 = [];
+
+        window.addEventListener('mousedown',(이벤트)=>{
+            마우스시작 = true;
+            시작좌표 = [이벤트.clientX, 이벤트.clientY];
+        })
+
+        window.addEventListener('mousemove',(이벤트)=>{
+            if(마우스시작){
+                마우스중 = true
+            }
+        })
+
+        window.addEventListener('mouseup',(이벤트)=>{
+            let x차이, y차이, 방향;
+
+            if(마우스중){
+            끝좌표 = [이벤트.clientX, 이벤트.clientY];
+            
+            x차이 = 끝좌표[0] - 시작좌표[0];
+            y차이 = 끝좌표[1] - 시작좌표[1];
+            
+            if(x차이 < 0 && Math.abs(x차이)/Math.abs(y차이) > 1){
+                방향 = '왼쪽';
+            }else if(x차이 >0 && Math.abs(x차이)/Math.abs(y차이) > 1){
+                방향 = '오른쪽';
+            }else if(y차이 < 0 && Math.abs(x차이)/Math.abs(y차이) < 1){
+                방향 = '위쪽'
+            }else if(y차이 >0 && Math.abs(x차이)/Math.abs(y차이) < 1){
+                방향 = '아래쪽'
+            }
+             }
+             
+
+            마우스시작=false;
+            마우스중=false;
+
+            switch(방향){
+                case '왼쪽' :{  
+                    let 새데이터 = [[],[],[],[]];
+                     데이터.forEach((열데이터,i)=>{
+                        열데이터.forEach((행데이터, j)=>{
+                            if(행데이터){
+                                if(새데이터[i][새데이터[i].length-1] && 새데이터[i][새데이터[i].length-1] === 행데이터){
+                                        새데이터[i][새데이터[i].length-1] *= 2;
+                                        let 현점수 = parseInt(점수표.textContent);
+                                        점수표.textContent = 현점수 + 새데이터[i][새데이터[i].length-1]
+                                }else{
+                                 새데이터[i].push(행데이터)
+                                }
+                            }
+                        })
+                     })
+
+                     구조데이터.forEach((열데이터,i)=>{
+                         구조데이터.forEach((행데이터,j)=>{
+                             데이터[i][j] = 새데이터[i][j] || 0;
+                         })
+                     })
+                break;
+                    }
+                case '오른쪽':{
+                  let 새데이터 = [[],[],[],[]];
+                    데이터.forEach((열데이터,i)=>{
+                        열데이터.forEach((행데이터,j)=>{
+                            if(행데이터){
+                                if(새데이터[i][0] && 새데이터[i][0] === 행데이터){
+                                    새데이터[i][0] *= 2;
+                                    let 현점수 = parseInt(점수표.textContent)
+                                    점수표.textContent = 현점수 + 새데이터[i][0]
+                                }else{
+                            새데이터[i].unshift(행데이터)
+                                }
+                            }
+                        })
+                    })
+                    구조데이터.forEach((열데이터,i)=>{
+                        구조데이터.forEach((행데이터,j)=>{
+                            데이터[i][3-j] = 새데이터[i][j] || 0;
+                        })
+                    })   
+                break;
+                }
+
+                case '위쪽' : {
+                    let 새데이터 = [[],[],[],[]];
+                    데이터.forEach((열데이터,i)=>{
+                        열데이터.forEach((행데이터,j)=>{
+                            if(행데이터){
+                                if(새데이터[j][새데이터[j].length-1] && 새데이터[j][새데이터[j].length-1]=== 행데이터){
+                                    새데이터[j][새데이터[j].length-1] *= 2;
+                                    let 현점수 = parseInt(점수표.textContent)
+                                    점수표.textContent = 현점수 + 새데이터[j][새데이터[j].length-1]
+                                }else{
+                            새데이터[j].push(행데이터);
+                                }
+                            }
+                        })
+                    })
+                    구조데이터.forEach((열데이터,i)=>{
+                        구조데이터.forEach((행데이터,j)=>{
+                            데이터[j][i] = 새데이터[i][j] || 0;
+                        })
+                    })
+                    break;
+                }
+                
+                case '아래쪽':{
+                    let 새데이터 = [[],[],[],[]];
+                    데이터.forEach((열데이터,i)=>{
+                        열데이터.forEach((행데이터,j)=>{
+                            if(행데이터){
+                                if(새데이터[j][0] && 새데이터[j][0] === 행데이터){
+                                    새데이터[j][0] *= 2;
+                                    let 현점수 = parseInt(점수표.textContent)
+                                    점수표.textContent = 현점수 + 새데이터[j][0];
+                                }else{
+                                새데이터[j].unshift(행데이터)
+                                }
+                            }
+                        })
+                    })
+
+                    구조데이터.forEach((열데이터,i)=>{
+                        구조데이터.forEach((행데이터,j)=>{
+                            데이터[3-j][i] = 새데이터[i][j] || 0;
+                        })
+                    })
+                    break;
+                }
+                default: return;
+            }
+            랜덤생성();
+        })
+        
+    </script>
+</body>
+</html>

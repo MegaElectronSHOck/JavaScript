@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .ball{
+            display:inline-block;
+            width: 40px;
+            height: 40px;
+            border: 1px solid black;
+            border-radius : 20px; 
+            line-height:40px;
+            font-size: 20px;
+            text-align:center;
+            margin-right: 20px;
+
+        }
+    </style>
+</head>
+<body>
+    <div>당첨숫자</div>
+    <div id='result'></div>
+    <div>보너스</div>
+    <div class='bonus'></div>
+
+    <script>
+        let candidate = Array(45).fill().map((v,i)=>i+1);
+        let shuffle = [];
+        while(candidate.length > 0){
+            let move_number = candidate.splice(Math.floor(Math.random()*candidate.length),1)[0];
+            shuffle.push(move_number);
+            }
+        let bonus_number = shuffle[shuffle.length-1];
+        let win_numbers = shuffle.slice(0,6).sort((p,c)=>p-c)
+        
+        let result = document.getElementById('result');
+        let bonus = document.getElementsByClassName('bonus')[0];
+
+        let ball_coloring = (number, result_output) =>{
+            let ball = document.createElement('div');
+            ball.className = 'ball';
+            ball.textContent = number;
+            let background;
+            if(number <= 10){
+                background = 'red';
+            }else if(number <= 20){
+                background = 'orange'
+            }else if(number <= 30){
+                background = 'yellow'
+            }else if(number <= 40){
+                background = 'blue'
+            }else{
+                background = 'green'
+            }
+            ball.style.background = background;
+            result_output.appendChild(ball)
+        }
+
+        for(let i =0; i < win_numbers.length; i++){
+          
+            setTimeout(()=>{
+                ball_coloring(win_numbers[i],result)
+            },(i+1)*1000)
+        
+        }
+        setTimeout(()=>{
+            ball_coloring(bonus_number,bonus);
+        },7000)
+    </script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .card {
+            display: inline-block;
+            margin-right: 20px;
+            margin-bottom: 20px;
+            width: 70px;
+            height: 100px;
+            perspective: 140px;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+
+        .card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-front {
+            background: navy;
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 1px solid black;
+            backface-visibility: hidden;
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body>
+    <div id="wrapper"></div>
+
+    <script>
+        let wrapper = document.getElementById('wrapper');
+        let colors = ['red', 'red', 'orange', 'orange', 'green', 'green', 'yellow', 'yellow', 'white', 'white', 'pink', 'pink'];
+        let color_candidate = colors.slice();
+        let color = [];
+        let hor = 4;
+        let ver = 3;
+        let 클릭카드 = [];
+        let 클릭플래그 = false;
+        let 완성카드 = [];
+            
+            let shuffle = () => {
+                for(let i = 0; color_candidate.length > 0; i++){
+                    color = color.concat(color_candidate.splice(Math.floor(Math.random()*color_candidate.length),1)[0])
+                }
+                console.log(color)
+                
+            }            
+
+
+        let card_setting = (hor, ver) => {
+            for ( let i = 0; i < hor * ver; i++){
+                let card = document.createElement('div');
+                card.className = 'card';
+                let cardInner = document.createElement('div');
+                cardInner.className= 'card-inner';
+                let cardFront = document.createElement('div');
+                cardFront.className = 'card-front';
+                let cardBack = document.createElement('div');
+                cardBack.className = 'card-back';
+                cardBack.style.backgroundColor = color[i];
+
+                card.addEventListener('click',()=>{
+                    if(클릭플래그 && !완성카드.includes(card)){
+                        card.classList.toggle('flipped')
+                        클릭카드.push(card)
+                        if(클릭카드.length === 2){
+                            if(클릭카드[0].querySelector('.card-back').style.backgroundColor === 클릭카드[1].querySelector('.card-back').style.backgroundColor){
+                                완성카드.push(클릭카드[0]);
+                                완성카드.push(클릭카드[1]);
+                                클릭카드 = [];
+                                if(완성카드.length === 12){
+                                    console.log('게임끝')
+                                }
+                            }else{
+                                
+                            }
+                        }
+
+                    }
+                })
+
+                cardInner.appendChild(cardFront)
+                cardInner.appendChild(cardBack)
+                card.appendChild(cardInner);
+                wrapper.appendChild(card);
+
+            }
+
+            document.querySelectorAll('.card').forEach((card,i)=>{
+                setTimeout(()=>{
+                    card.classList.add('flipped')
+                },1000+100*i)
+            })
+            document.querySelectorAll('.card').forEach((card,i)=>{
+                setTimeout(()=>{
+                    card.classList.remove('flipped')
+                    클릭플래그 = true;
+                },5000)
+            })
+        }
+        shuffle();
+        card_setting(hor,ver)
+    </script>
+</body>
+</html>

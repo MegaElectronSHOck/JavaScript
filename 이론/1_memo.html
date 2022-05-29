@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        document.write(typeof('테스트')) ; // 'string' 출력
+
+        x = 1; y = 1;  
+        y = x++; // x의 값이 y로 대입되므로 y=1, x=2;
+
+        prompt('안녕하세요','반갑습니다.') // 확인창 제목 '안녕하세요', 입력란 기본값 '반갑습니다'
+
+       true && document.write('논리곱'); // '논리곱' 출력 , 앞에가 true 이면 뒤에꺼 무조건 실행
+       false || document.write('논리합'); // '논리합' 출력, 앞에고 fale 이면 뒤에꺼 무조건 실행
+
+       break; // 탈출 - 가장 가까운 반복문 탈출
+       continue; // 다음 문장을 실행하지 않고 다음 반복
+
+       // 익명함수는 변수에 넣어서 사용해야 한다
+
+       // <button onclick="func()">함수실행</button>
+
+       (function(){
+           document.write('테스트')
+       })() // 람다함수 => 즉시실행
+
+       // 내장함수
+       if(isNan(n1)){ // 숫자가 아니니?
+            document.write('실행문')
+       } 
+       if(isFinite(n2)){ 
+           document.write('실행문') // 유한이니?
+       }
+
+       parseInt('3월') // 3이 나온다
+       parseInt('3.14') // 3이 나온다. 소수도 소수자리를 빼서 정수로 만들어줌
+       Number('3월') //nan이 나온다
+
+
+       // 객체 (Number객체)
+       var n = 328.576
+       document.write(n.toFixed()) //  329 반올림 소수점 없앰
+       document.write(n.toFixed(2)) // 328.58 소수점 두째자리까지 표현 반올림
+       
+       document.write(n.toString())
+
+       //객체 (String객체)
+       var str = 'Java_Script';
+       document.write(str.length) ; // 11
+       document.write(str.charAt(0)) ; // J 인덱스번호 0번을 찾아라
+       document.write(str.charAt(0)) ; // 인덱스번호 0번을 찾아라
+
+       document.write(str.toLowerCase()); // 소문자로 바꿔라
+       document.write(str.toUpperCase()); // 대문자로 바꿔라
+
+       document.write(str.indexOf('a')); // 1 왼쪽부터 시작하여 인덱스번호를 찾아라
+       document.write(str.lastIndexOf('a')); // 7 끝에서부터 시작하여 인덱스번호를 찾아라
+
+       document.write(str.slice(4,10)); // _Scrip 4번부터 10번 전까지
+         let desc = "abcdefg";
+         desc.slice(2); // cdefg
+         desc.slice(0,5); //abcde
+         desc.slice(2,-2); //cde 음수면 끝에서 부터 센다
+         // n이 음수인경우 끝에서부터 절대값 n번째  n은 사이므로 2번째인 f
+
+       document.write(str.substring(4,10)); // _Scrip 4번부터 10번 전까지
+         str.substring(n,m) 
+         // n과 m을 바꿔도 동작 -> 그냥 n과 m사이라고 생각하면 편함
+         // 음수는 허용하지 않음. 음수는 0으로 인식
+
+       document.write(str.substr(4,3)); // _Sc 4번부터 3글자
+         str.substr(n,m);
+         desc.substr(-4,2); // de 
+         // n부터 시작, m개를 가져옴
+         // n이 음수인경우 끝에서부터 절대값 n번째  n은 사이므로 4번째인 d
+
+       document.write(str.split("_")[1]); // Script '_'를 기준으로 배열로 나눔
+       document.write(str.replace("Java_Script",'jQuery')); // 'jQuery'로 바뀜
+
+       var str1 = 'java';
+       var str2 = 'script';
+       document.write(str1.concat(str2)); // str1에다가 str2를 합쳐라
+       document.write(str.anchor('jQuery')); // a태그만입힘  jQuery는 a태그의 name속성값
+
+       document.write(str.link('http://wooreeweb.com'));  // a태그에 링크까지 입힘
+
+       //Math객체
+       document.write(Math.round(20.44)) // 20 반올림
+       document.write(Math.round(20.55)) // 21 반올림
+
+       document.write(Math.ceil(20.44)) // 올림
+       document.write(Math.floor(20.44)) // 내림
+
+       document.write(Math.random()) //0 ~ 0.99999 
+       // Math.floor(Math.random()*3) 0 ~ 2
+ 
+       // Math.pow(3,2) => 3의 제곱
+       // Math.max(20,22) , Math.min(20,22)
+
+        // setInterval
+
+        var change_bg = setInterval(function(){
+            i++;
+            if( i > 2){
+                    clearInterval(change_bg)
+            }
+        },2000)
+
+        // setTimeout
+        window.onload = function(){ 
+        var bg = document.getElementById('bg');
+        var i = 0;
+        var change_bg;
+        this.onresize = function (){  // 이 브라우저를 리사이즈할때
+            clearTimeout(change_bg);  // 먼저 timeout을 클리어 시키고 나서 => 메모리에 남아있는 setTimeout을 제거
+            change_bg = setTimeout(function(){ // settimeout 지정
+                i++;
+                if( i>2){ i = 0;}
+            },250) // 250 후에 배경색 바꿈
+        }
+
+        //기타 브라우저 메소드
+
+        var win = window.open('','win','width:200, heigth:200');
+        win.moveTo(0,0) ; // 절대위치
+        function m (){
+          win.moveBy(50,50) // 상대위치
+        }
+
+        /* 
+        resizeBy(x,y) : 상대크기로 변경
+        resizeTo(x,y) : 절대크기로 변경
+        scrollBy(x,y) : 스크롤 위치를 상대적으로
+        scrollTo(x,y) : 스크롤 위치를 절대적으로
+        focus() : 윈도우에서 포커스를 맞춤
+        blur() : 포커스가 빠져나감
+        */
+
+        // 팝업창에 내용쓰기
+        var str = "<h1>팝업창에 내용쓰기</h1>";
+       str += "<p>팝업창에 내용 이어서</P>";
+        win.document.write(str)
+
+
+        // location 객체
+        document.write(location.pathname + "<br>") // 경로-> 폴더이름부터 파일이름까지
+        document.write(location.href + "<br>") // 경로 -> http부터 파일이름까지
+        document.write(location.search + "<br>") // 쿼리문 -> 파일이름 뒤에 붙은 쿼리문(?등)까지 다 리턴
+
+        location.reload(); // 새로고침
+        location.replace('http://naver.com') // 네이버로 페이지 이동
+
+        // history 객체
+        history.back(); 
+        history.foward();
+        history.go(-2); // 두단계 이전 페이지
+
+        // screen 객체
+
+        var w = screen.width; // 화면(모니터) 너비
+        var h = screen.height; //화면(모니터) 높이
+        /* .availWidth : 작업표시줄 제외 너비
+           .availHeight  : 작업표시줄 제외 높이
+           */
+
+        // navigator 객체
+        var browser = navigator.userAgent;
+        var browserName = "";
+        if( browser.match(/Trident/)){
+          browserName = '인터넷 익스플로러';
+        } else if(browser.match(/chrome/)){
+          browserName = '크롬';
+        } else if(browser.match(/Firefox/)){
+          browserName = '파이어폭스';
+        } else {
+          browserName = '알수없는 브라우저';
+        }
+
+      }
+
+      
+
+
+
+
+
+
+    </script>
+</body>
+</html>

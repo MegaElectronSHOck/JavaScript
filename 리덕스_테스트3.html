@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/redux/4.1.0/redux.min.js" 
+    integrity="sha512-F21iSaHGX/3NFz5SuwoH6pGhTPxtoJoWWULqQVPQPtLm7nbK5r8vRSSSYy3Aj+H39cVrVm4+3ikGoVD1AjE0sQ==" 
+    crossorigin="anonymous" 
+    referrerpolicy="no-referrer"></script>
+    <style>
+        .container{
+            border : 5px solid black;
+            padding: 10px;
+        }
+        header h1, nav li{cursor : pointer;}
+        
+    </style>
+</head>
+<body>
+    <div id="subject"></div>
+    <div id="toc"></div>
+    <div id="control"></div>
+    <div id="content"></div>
+    <script>
+        const subject = () => {
+            document.getElementById('subject').innerHTML = `
+                <header>
+                    <h1 onclick="
+                        event.preventDefault();
+                        store.dispatch({type:'CHANGE_MODE', mode:'welcome'})
+                    ">WEB</h1>
+                    hello, WEB!!
+                </header>
+            `
+        }
+        
+        const TOC = () => {
+            const state = store.getState();
+            let liTags = '';
+            for(let i =0; i < state.content.length;i++){
+                liTags = liTags + `<li onclick="
+                    event.preventDefault();
+                    store.dispatch({type:'SELECT', id:${state.content[i].id}})
+                ">${state.content[i].title}</li>`
+            }
+            document.getElementById('toc').innerHTML = `
+                <nav>
+                <ol>${liTags}</ol>
+                </nav>
+            `
+        }
+
+        const control = () =>{
+            document.getElementById('control').innerHTML = `
+                <ul>
+                    <li><a href='/' onclick="
+                        event.preventDefault();
+                        store.dispatch({type:'CHANGE_MODE', mode : 'create'})
+                        ">CREATE</a></li>
+                        <li><a href ='/' onclick="
+                            event.preventDefault();
+                            store.dispatch({type : 'DELETE'})
+                            ">DELETE</a></li>
+                        <li><a href='/' onclick="
+                            event.preventDefault();
+                            store.dispatch({type:'CHANGE_MODE', mode : 'update'})
+                            ">UPDATE</a></li>
+                </ul>
+            `
+        }
+
+        const article = () => {
+            const state = store.getState();
+            const content = document.getElementById('content')
+            if(state.mode === 'welcome'){
+                content.innerHTML = `
+                    <article>
+                        <h2>Welcome</h2>    
+                        hello, Redux
+                    </article>
+                `
+            }else if(state.mode === 'read'){
+                let _title, _desc;
+                for(let i =0; i < state.content.length; i++){
+                    if(state.selected_id === state.content[i].id){
+                        _title = state.content[i].title;
+                        _desc = state.content[i].desc
+                    }
+                }
+                content.innerHTML = `
+                    <article>
+                        <h2>${_title}</h2>    
+                        ${_desc}
+                    </article>
+                `
+            }else if(state.mode === 'create'){
+                content.innerHTML = `
+                <article>
+                    <form onsubmit="
+                        event.preventDefault();
+                        let _title = this.title.value;
+                        let _desc = this.desc.value;
+                        store.dispatch({type:'CREATE', title: _title, desc:_desc })
+                    ">
+                        <p><input type='text' name = 'title' placeholder='title'/></p>
+                        <p><textarea name='desc' placeholder='description'></textarea></p>
+                        <p><input type='submit' value='전송'/></p>
+                    </form>
+                </article>
+                `
+            }else if(state.mode ==='update'){
+                content.innerHTML =`
+                    <article>
+                        <form onsubmit="
+                            event.preventDefault();
+                            let _title = this.title.value;
+                            let _desc = this.desc.value;
+                            store.dispatch({type:'UPDATE', title:_title, desc : _desc })
+                        ">
+                            <p><input type='text' name = 'title' placeholder='title'/></p>
+                            <p><textarea name='desc' placeholder='description'></textarea></p>
+                            <p><input type='submit' value='수정'/></p>
+                        </form>    
+                    </article>
+                `
+            }
+        }
+
+        const reducer = (state, action) => {
+            if(state === undefined){
+                return {
+                    mode : 'welcome',
+                    max_id : 5,
+                    selected_id : 1,
+                    content : [
+                        {id:1, title : 'HTML', desc : 'HTML is ...'},
+                        {id:2, title : 'CSS', desc : 'CSS is ...'},
+                        {id:3, title : 'JavaScript', desc : 'JavaScript is ...'},
+                        {id:4, title : 'React', desc : 'React is ...'},
+                        {id:5, title : 'Redux', desc : 'Redux is ...'},
+                    ]
+                }
+            }
+            let newState;
+            if(action.type === 'CHANGE_MODE'){
+                newState = {...state, mode : action.mode}
+                console.log(action.mode)
+            }else if(action.type === 'SELECT'){
+                newState = {...state, mode : 'read', selected_id:action.id}
+            }else if(action.type === 'CREATE'){
+                let newMaxId = state.max_id +1;
+                let newContent = [...state.content, {id:newMaxId, title: action.title, desc : action.desc}];
+                newState = {...state, mode : 'read', selected_id : newMaxId, max_id : newMaxId, content : newContent}
+            }else if(action.type === 'DELETE'){
+                console.log('test')
+                let copyContent = [...state.content]
+                for(let i =0; i < state.content.length; i++){
+                    if(state.selected_id === state.content[i].id){
+                        copyContent.splice(i, 1)
+                    }
+                }
+                newState = {...state, mode:'welcome', content : copyContent}
+            }else if(action.type==='UPDATE'){
+               
+                let copyContent = [...state.content]
+                for(let i =0 ; i < state.content.length;i++){
+                    if(state.selected_id === state.content[i].id){
+                        copyContent[i] = {id : copyContent[i].id, title: action.title, desc:action.desc}
+                    }
+                }
+                newState = {...state, content : copyContent, mode : 'read'}
+                
+            }
+            return newState;
+        }
+        const store = Redux.createStore(reducer)
+        store.subscribe(TOC)
+        store.subscribe(article)
+        subject();
+        TOC();
+        control();
+        article();
+    </script>
+</body>
+</html>

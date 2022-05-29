@@ -1,0 +1,33 @@
+<html>
+    <head></head>
+    <body>
+        <div></div>
+        <input id='inputword' type="text" />
+        <button>클릭</button>
+        <div></div>
+        
+        <script>
+            var first_word = '비둘기';
+            var question = document.getElementsByTagName('div')[0]
+
+            var inputword = document.getElementById('inputword');
+            inputword.focus();
+            var clickBtn = document.getElementsByTagName('button')[0]
+            var result = document.getElementsByTagName('div')[1]
+            question.textContent = first_word;
+            clickBtn.addEventListener('click', ()=>{
+                if(inputword.value[0] === question.textContent[question.textContent.length-1]){
+                    result.textContent = '딩동댕!'
+                    question.textContent = inputword.value
+                    inputword.value = ''
+                    inputword.focus()
+                }else{
+                    result.textContent = "땡~!"
+                    inputword.value = ''
+                    inputword.focus()
+                }
+            })
+            
+        </script>
+    </body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        table{border-collapse : collapse;}
+        td{width: 40px; height:40px; text-align:center; border:1px solid black;}
+    </style>
+</head>
+<body>
+    <script>
+        let body = document.body;
+        let table = document.createElement('table');
+        let result = document.createElement('div');
+        let rows = [];
+        let cells = [];
+        let turn = 'X';
+
+        let winCheck = (howRow, howCell) => {
+            let tie = false;
+
+            if(cells[howRow][0].textContent === turn && cells[howRow][1].textContent === turn && cells[howRow][2].textContent === turn){
+                tie = true;
+            }else if(cells[0][howCell].textContent === turn && cells[1][howCell].textContent === turn && cells[2][howCell].textContent === turn){
+                tie = true;
+            }else if(cells[0][0].textContent === turn && cells[1][1].textContent === turn && cells[2][2].textContent === turn){
+                tie = true;
+            }else if(cells[0][2].textContent === turn && cells[1][1].textContent === turn && cells[2][0].textContent === turn){
+                tie = true;
+            }
+
+            return tie;
+        }
+
+        let initiate = (o) =>{
+            if(o){
+               result.textContent = '무승부 입니다.'
+            }else{
+                result.textContent = `${turn}님의 승리~!`
+            }
+
+            setTimeout(()=>{
+                turn = 'X';
+                result.textContent = ''
+                cells.forEach((row,i)=>{
+                    row.forEach((cell, j)=>{
+                        cell.textContent = '';
+                    })
+                })
+            },1000)
+        }
+
+        let choice_check = (e) => {
+            if(turn === 'O'){
+                return;
+            }
+
+            let howRow = rows.indexOf(e.target.parentNode);
+            let howCell = cells[howRow].indexOf(e.target)
+
+            if(cells[howRow][howCell].textContent !== ''){
+                return;
+            }else{
+               
+                cells[howRow][howCell].textContent = turn;
+                console.log(turn)
+                let win = winCheck(howRow, howCell);
+                let candidate = [];
+                cells.forEach((row, i)=>{
+                    row.forEach((cell,j)=>{
+                        candidate.push(cell)
+                    })
+                })
+
+                candidate = candidate.filter((v,i) => !v.textContent );
+                console.log(candidate.length)
+
+                if(win){
+                    initiate()
+                }else if(candidate.length === 0){
+                    initiate(true)
+                }else{
+                    if(turn === 'X'){
+                        turn = 'O'
+                    }
+
+                    
+                   
+
+                    
+                    setTimeout(()=>{
+                        let computerChoice = candidate[Math.floor(Math.random()*candidate.length)];
+                        let howRow = rows.indexOf(computerChoice.parentNode)
+                    let howCell = cells[howRow].indexOf(computerChoice);
+                        computerChoice.textContent = turn;
+                        let win = winCheck(howRow, howCell)
+                        if(win){
+                            initiate()
+                        }
+                        turn = 'X'
+                    },1000)
+                }
+            }
+        }
+
+        for(let i =0; i < 3; i++){
+            let tr = document.createElement('tr');
+            rows.push(tr);
+            cells.push([]);
+            for(let j = 0; j < 3; j++){
+                let td = document.createElement('td');
+                td.addEventListener('click',choice_check)
+                cells[i].push(td)
+                tr.appendChild(td);
+                
+            }
+            table.appendChild(tr)
+        }
+        body.appendChild(table);
+        body.appendChild(result);
+    </script>
+</body>
+</html>

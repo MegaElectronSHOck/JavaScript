@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!-- 폼 유효성검사-->
+     <form action='#' name='frm' onsubmit='return check()' >
+        <label for='product'>상품입력</label>
+        <input type='text' name='product' id='product'>
+        <input type='submit' value='검색'>
+    </form>
+
+    <script>
+        function check(){
+            var frm = document.frm; // form은 getElementByName('frm')으로 쓰지 않는다.
+            if(!frm.product.value){ // 값이 없다면
+                alert('상품명을 입력하세요');
+                frm.product.focus();
+                return false;
+            }
+
+        }
+
+        document.forms[0].elements[0].value; //첫번째 form의 첫번째 요소의 값 forms = form들
+        document.forms["fm2"].elements['query'].value;
+    </script> 
+
+    <!-- option 1-->
+     <form name = 'frm2'>
+        <select name='site'>
+            <option value=''>사이트</option>
+            <option value='http://naver.com'>우리웹</option>
+        </select>
+        <input type='button' value='확인' onclick='siteLink()'>
+    </form>
+
+    <script>
+        function siteLink (){
+           
+            var frm=document.frm2;
+            var linkValue = frm.site.options[frm.site.selectedIndex].value; // selectedIndex 
+            if(linkValue){
+                window.open(linkValue,'new')
+            }
+        }
+    </script> 
+
+    <!-- option 2-->
+    <form name='frm3'>
+        <select name='subject'>
+            <option value=''>과목선택</option>
+            <option value='javascript'>자바스크립트</option>
+        </select>
+        <select name='job'>
+            <option value=''>직업선택</option>
+            <option value='javascript1'>학생</option>
+            <option value='javascript2'>회사원</option>
+        </select>
+    </form>
+
+    <script>
+        var frm3 = document.frm3;
+        frm3.subject.add(new Option('제이쿼리', 'jQuery'));
+        document.write(frm3.job.children[2].textContent)
+    </script>
+
+    <!-- this -->
+    <form name='frm4'>
+        <input type='button' value='확인' onclick='javascript:view(this.value)' /> <!-- this.value = 확인 -->
+    </form>
+    <form name='frm5'>
+        <input type='button' value='form확인' onclick='javascript:view(this.form.name)' /> <!-- this.form.name = frm5-->
+    </form>
+</body>
+</html>

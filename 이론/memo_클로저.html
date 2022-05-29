@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        // 클로저 : 함수가 생성될 당시의 외부변수를 기억, 생성 이후에도 계속 접근 가능
+
+        function makeAdder(x){
+            return function (y){
+                return x + y;
+            }
+        }
+
+        const add3 = makeAdder(3); // add3는 return된  function(y){ return x + y};  여기서 x = 3;
+        console.log(add3(2)); // 5 -> makeAdder함수는 끝나고 add는 return된 함수일 뿐이지만 외부함수인 x=3을 사용할수 있다.
+
+        //즉, add3 = makeAdder(3); 이라고 사용했을때 3인 x는 add3함수의 외부변수로서 기억되어 add3인 return된 함수를 사용할시 그대로 기억되어 사용될수 있다.
+
+        const add10 = makeAdder(10);
+        console.log(add10(5)); // 15
+        console.log(add3(1)); // 4 < add3의 외부변수인 x=3 을 기억
+
+
+        
+    </script>
+</body>
+</html>

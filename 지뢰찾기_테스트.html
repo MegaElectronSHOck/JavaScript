@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        table {
+              border-collapse: collapse;
+          }
+          td {
+              border: 1px solid #bbb;
+              text-align: center;
+              line-height: 20px;
+              width: 20px;
+              height: 20px;
+              background: #888;
+          }
+          td.opened {
+              background: white;
+          }
+          td.flag {
+              background: red;
+          }
+          td.question {
+              background: orange;
+          }
+  </style>
+</head>
+<body>
+    <input id='hor' type='number' placeholder='가로' value='10' />
+    <input id='ver' type='number' placeholder='세로' value='10' />
+    <input id='mine' type='number' placeholder='지뢰' value='20' />
+    <button id='exac'> 실행 </button>
+    <table>
+        <thead>
+            <tr><td><span id='timer'>0</span>초</td></tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <div id='result'></div>
+    <script>
+        let tbody = document.querySelector('table > tbody');
+        let result = document.getElementById('result');
+        let timer = document.getElementById('timer');
+        let dataset = [];
+        let shuffle = [];
+        let stopflag = false;
+        let opened_count = 0;
+        let code = {
+            opened : -1,
+            question : -2,
+            flag : -3,
+            question_mine : -4,
+            flag_mien : -5,
+            normal : 0,
+            mine : 1,
+        }
+
+        document.querySelector('#exac').addEventListener('click',()=>{
+           
+
+            tbody.innerHTML ='';
+            dataset = [];
+            opened_count = 0;
+            shuffle = [];
+            result.textContent = '';
+            stopflag = false;
+            timer.textContent = 0;
+            let hor = parseInt(document.querySelector('#hor').value);
+            let ver = parseInt(document.querySelector('#ver').value);
+            let mine = parseInt(document.querySelector('#mine').value);
+
+            let candidate = Array(hor*ver).fill().map((v,i) => i);
+
+            while(candidate.length > hor*ver - mine){
+                let chosen = candidate.splice(Math.floor(Math.random()*candidate.length),1)[0];
+                shuffle.push(chosen);
+            }
+            let counter = 0;
+           let timering = setInterval(()=>{
+            counter++;
+            timer.textContent = counter;
+           },1000)
+
+            for(let i = 0; i < hor; i++){
+                let tr = document.createElement('tr');
+                let arr = [];
+                dataset.push(arr);
+                for(let j = 0; j < ver; j++){
+                    arr.push(code.normal)
+                    let td = document.createElement('td');
+                    td.addEventListener('contextmenu',(e)=>{
+                        e.preventDefault();
+                        if(stopflag){
+                            return;
+                        }
+                        let parent_tr = e.currentTarget.parentNode;
+                        let cell = Array.prototype.indexOf.call(parent_tr.children, e.currentTarget);
+                        let row = Array.prototype.indexOf.call(tbody.children, parent_tr);
+
+                       
+
+                        if(e.currentTarget.textContent === '' || e.currentTarget.textContent === 'X'){
+                            e.currentTarget.textContent = '!';
+                            e.currentTarget.classList.add('flag');
+                            if(dataset[row][cell] === code.normal){
+                                dataset[row][cell] = code.flag;
+                            }else{
+                                dataset[row][cell] = code.flag_mine
+                            }
+                        }else if(e.currentTarget.textContent === '!'){
+                            e.currentTarget.textContent = '?';
+                            e.currentTarget.classList.remove('flag');
+                            e.currentTarget.classList.add('question');
+                            if(dataset[row][cell] === code.flag){
+                                dataset[row][cell] = code.question;
+                            }else{
+                                dataset[row][cell] = code.question_mine;
+                            }
+                        }else if(e.currentTarget.textContent === '?'){
+                            if(dataset[row][cell] === code.question){
+                                e.currentTarget.textContent = '';
+                                e.currentTarget.classList.remove('question');
+                                dataset[row][cell] = code.normal;
+                            }else{
+                                e.currentTarget.textContent = 'X';
+                                e.currentTarget.classList.remove('question')
+                                dataset[row][cell] = code.mine;
+                            }
+                        }
+
+
+                    })
+                    td.addEventListener('click',(e)=>{
+                        if(stopflag){
+                            return;
+                        }
+                        let parent_tr = e.currentTarget.parentNode;
+                        let cell = Array.prototype.indexOf.call(parent_tr.children, e.currentTarget)
+                        let row = Array.prototype.indexOf.call(tbody.children, parent_tr)
+                        if([code.opened, code.question, code.question_mine, code.flag, code.flag_mine].includes(dataset[row][cell])){
+                            return;
+                        }
+
+                        e.currentTarget.classList.add('opened');
+                        opened_count += 1;
+
+                        if(dataset[row][cell] === code.mine){
+                            e.currentTarget.textContent = '펑';
+                            stopflag = true;
+                        }else{
+                            let cloud = [dataset[row][cell-1], dataset[row][cell+1]]
+                            if(dataset[row-1]){
+                                cloud = cloud.concat([dataset[row-1][cell-1], dataset[row-1][cell], dataset[row-1][cell+1]])
+                            }
+                            if(dataset[row+1]){
+                                cloud = cloud.concat([dataset[row+1][cell-1], dataset[row+1][cell], dataset[row+1][cell+1]])
+                            }
+
+                            let cloud_mine = cloud.filter((v,i)=> [code.mine, code.question_mine, code.flag_mine].includes(v)).length;
+                            e.currentTarget.textContent = cloud_mine || '';
+                            dataset[row][cell] = code.opened;
+
+                            if(cloud_mine === 0) {
+                                let cloud_td = [tbody.children[row].children[cell-1], tbody.children[row].children[cell+1]];
+                                if(tbody.children[row-1]){
+                                    cloud_td = cloud_td.concat([
+                                        tbody.children[row-1].children[cell-1],
+                                        tbody.children[row-1].children[cell],
+                                        tbody.children[row-1].children[cell+1]
+                                    ])
+                                }
+                                if(tbody.children[row+1]){
+                                    cloud_td = cloud_td.concat([
+                                        tbody.children[row+1].children[cell-1],
+                                        tbody.children[row+1].children[cell],
+                                        tbody.children[row+1].children[cell+1]
+                                    ])
+                                }
+                                
+                                cloud_td.filter((v,i)=>v).forEach((c,i)=>{
+                                    let parent_tr = c.parentNode;
+                                    let cell = Array.prototype.indexOf.call(parent_tr.children, c);
+                                    let row = Array.prototype.indexOf.call(tbody.children, parent_tr);
+
+                                    if(dataset[row][cell] !== code.opened){
+                                        c.click();
+                                    }
+                                })
+                            }
+
+
+                        }
+                        if(opened_count === hor*ver - mine){
+                            stopflag = true;
+                            clearInterval(timering);
+                            
+                            result.textContent = `${counter}초 만에 완성하셨습니다.`;
+                            
+
+                        }
+                        
+                    })  
+                    tr.appendChild(td);
+                }
+                tbody.appendChild(tr)
+            }
+
+
+
+            for(let i = 0; i < shuffle.length; i++){
+                let mine_hor = Math.floor(shuffle[i] / hor); 
+                let mine_ver = shuffle[i] % ver;
+                dataset[mine_hor][mine_ver] = code.mine
+                tbody.children[mine_hor].children[mine_ver].textContent = 'X'
+            }
+            
+        })
+    </script>
+</body>
+</html>

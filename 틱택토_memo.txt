@@ -1,0 +1,1 @@
+ var 바디 = document.body;

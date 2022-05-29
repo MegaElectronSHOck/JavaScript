@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        document.getElementById('content')
+        document.getElementsByClassName('content')
+        document.getElementsByTagName('content')
+        document.getElementsByName('content')
+        document.querySelector('.content h1')
+
+        var txt = document.getElementByName('txt');
+
+        result += txt.item(0).value; // 인덱스 0번 
+        result += txt.item(1).value; //인덱스 1번
+        /* result += txt[0].value 
+           result += txt[1].value
+        */
+        result += txt.length;
+        
+        var gnb = document.getElementById('gnb');
+
+        var gnbChilds = gnb.childNodes; // 선택된 노드이 자식 노드들 (요소, 텍스트)
+        var gnbChildren = gnb.children ; // 선택된 노드의 자식 노드들 (요소만, 테스트 제외)
+        gnb.parentNode.id // 선택된 요소의 부모요소 gnb.parentNode.parentNode
+        gnb.nextSibling.id // 선택된 요소의 형제 (동생)
+        gnb.previousSibling.className ; // 선택된 요소의 형제 (형)
+        gnb.firstChild // 첫째자식
+        gnb.lastChild // 막내자식
+        gnb.removeChild(gnb.firstChild) // gnb의 첫번째 자식을 삭제
+
+        // 요소의 생성
+        var div = document.createElement('div') // div생성
+        var txt = document.createTextNode('텍스트') // 텍스트 쓰기
+
+        //노드 삭제
+        div.remove(); // div노드 삭제
+        div.removeChild() // ()안에 삭제할 자식 선택
+
+        
+        //classList
+        div.classList.remove('test')
+        div.classList.add('test2')
+        div.classList.toggle('test2')
+
+        div.appendChild(txt);
+        document.body.appendChild(div);
+
+        // 속성의 생성과 제거
+
+        div.setAttribute('href','http://naver.com');
+        div.setAttribute('target','new');
+        div.setAttribute('title','새창');
+        div.item(0).firstChild.removeAttribute('title')
+
+        // 스타일 속성 -> 태그에 직접 삽입이 된다. 지저분함
+        content.style.width = '200px';
+        content.style.height = '200px';
+        content.style.borderBottomWidth = '4px';
+
+        </script>
+</body>
+</html>

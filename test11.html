@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{margin: 0; padding:0;}
+       ul{list-style: none;}
+       body{
+           height: 100%; overflow: hidden;
+       }
+       .game-text{
+           display : none;
+           justify-content :center;
+           align-items : center;
+           flex-direction: column;
+           position : fixed;
+           width : 100%; 
+           height: 100%; 
+           background: rgba(0,0,0,0.7);
+           left : 0;
+           top : 0;
+           color : #fff;
+           font-size:50px;
+       }
+       .game-text > button {
+           padding: 0.5rem 1rem;
+           color : #fff;
+           background: salmon;
+           border : none;
+           cursor : pointer;
+       }
+       .score{
+           text-align: center;
+           font-size: 36px;
+           margin-bottom: 2rem;
+       }
+      
+       .playground > ul {
+           border : 1px solid #333;
+           width: 250px; 
+           margin: 100px auto 50px;
+       }
+       .playground > ul > li {
+           width: 100%; height: 25px;
+       }
+       .playground > ul > li > ul { display: flex}
+       .playground > ul > li > ul > li{
+           width: 25px; height: 25px; outline : 1px solid #ccc;
+       }
+       .tree{
+           background: #67c23a;
+           outline : 1px solid #888;
+       }
+       .bar{
+           background: salmon;
+           outline : 1px solid #888;
+       }
+       .zee{
+           background: #e6a23c;
+           outline : 1px solid #888;
+       }
+       .elLeft{
+           background: #8e44ad;
+           outline : 1px solid #888;
+       }
+       .elRight{
+           background: #16a085;
+           outline : 1px solid #888;
+       }
+       .square{
+           background: #2c82c9;
+           outline : 1px solid #888;
+       }
+       #ex {
+           text-align:center;
+       }
+   </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="playground">
+            <ul></ul>
+        </div>
+    </div>
+    <script type = 'module'>
+       import BLOCKS from './blocks.js';
+
+        const playground = document.querySelector('.playground > ul');
+
+        let tempMovingItem;
+
+        const GAME_ROWS = 20;
+        const GAME_COLS = 10;
+
+        const movingItem = {
+            type : 'tree',
+            direction : 0,
+            top : 0,
+            left : 3
+        }
+
+        init();
+
+        function init(){
+            tempMovingItem = {...movingItem}
+            for(let i = 0; i < GAME_ROWS; i ++){
+                prependNewline();
+            }
+           renderBlocks();
+        }
+
+        function prependNewline(){
+            const li = document.createElement('li');
+            const ul = document.createElement('ul');
+            for(let i = 0; i < GAME_COLS; i++){
+                const matrix = document.createElement('li');
+                ul.prepend(matrix);         
+            }
+            li.prepend(ul)
+            playground.prepend(li)
+        }
+
+        function renderBlocks(moveType = ''){
+            const {type, direction , top, left} = tempMovingItem;
+            const movingBlocks = []
+            for(let i = 0; i < 2; i++){
+            movingBlocks.push(document.querySelector(`.moving${i}`));
+              
+            }
+     
+            movingBlocks.forEach((moving, i)=>{
+               
+                moving.classList.remove(type, `moving${i}`)
+            })
+            
+            BLOCKS[type][direction].forEach((block,i)=>{
+            
+                const x = block[0] + left;
+                const y = block[1] + top;
+
+               const target = playground.childNodes[y]? playground.childNodes[y].childNodes[0].childNodes[x] : null;
+               const isAvailable = checkEmpty(target);
+               if(isAvailable){
+                   target.classList.add(type, `moving${i}`)
+               }else{
+                   console.log('테스트')
+                    tempMovingItem = {...movingItem};
+                
+                seizeBlock();
+                renderBlocks()
+                //     setTimeout(()=>{
+                      
+                //    if(moveType === 'top'){
+                //        seizeBlock();
+                //    }
+                //    renderBlocks();
+                //     },0)
+               }
+            })
+            movingItem.top = top;
+            movingItem.left = left;
+            movingItem.direction = direction;
+        }
+
+        function seizeBlock(){
+            const movingBlocks = []
+            for(let i = 0; i < 4; i++){
+            movingBlocks.push(document.querySelector('.moving'+i));
+            }
+            console.log(movingBlocks)
+        }
+
+        function checkEmpty(target){
+            if(!target ){
+                return false;
+            }else{
+                return true;
+            }
+        }
+
+        function moveBlock(moveType, amount){
+            tempMovingItem[moveType] += amount;
+            renderBlocks(moveType)
+        }
+
+        document.addEventListener('keydown',(e)=>{
+       
+            switch(e.keyCode){
+                case 37:
+                    moveBlock('left', -1)
+                break;
+                case 39:
+                    moveBlock('left', 1)
+                break;
+                case 40:
+                    moveBlock('top', 1)
+                break;
+                default :
+                break;
+            }
+        })
+    </script>
+</body>
+</html>

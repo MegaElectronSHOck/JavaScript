@@ -1,0 +1,6 @@
+screen.classList.contains('waiting')
+screen.classList.remove('waiting');
+screen.classList.add('ready')
+start_time = new Date();
+speed.textContent = record.reduce((p,v)=>p+v)/record.length;
+.reduce((p,v)=>{ return p + v}, n) // p: 누적값 , v : 현재값, n : p의 초기값

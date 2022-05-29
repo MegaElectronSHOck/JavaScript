@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id='ret1'></div>
+    <div id='ret2'></div>
+    <div id='ret3'></div>
+    <div id='ret4'></div>
+    <div id='ret5'></div>
+    <script>
+        var cal = function(){
+            var x = 0;
+            return {
+                po : function () { return x++;}, 
+                mo : function () {return x--;}
+            }
+        }
+
+        var pot = cal();
+        var mot = cal();
+
+        document.getElementById("ret1").innerHTML = pot.po(); // 0 x++ 이므로 x=0을 먼처 return 시키고 x++을 처리
+        document.getElementById("ret2").innerHTML = pot.po(); // 1
+        document.getElementById("ret3").innerHTML = pot.mo(); // 2 x-- 이므로 x=2를 먼저 출력후 -- 시킴
+        document.getElementById('ret4').innerHTML = mot.mo(); // 0 pot 라는 함수와 mot 라는 함수는 다르므로 값도 이어질수 없다. 다시 0으로 초기화
+        document.getElementById('ret5').innerHTML = mot.mo(); // -1 
+
+    </script>
+</body>
+</html>

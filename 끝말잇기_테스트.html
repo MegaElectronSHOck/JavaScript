@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id='question'></div>
+    <form>
+        <input type='text' />
+        <input type='submit' value='클릭' />
+    </form>
+    <div id="result"></div>
+
+    <script>
+        let first_word = '비둘기';
+        let question = document.getElementById('question');
+        let form_sub = document.getElementsByTagName('form')[0];
+        let input_result = document.getElementsByTagName('input')[0];
+        let result = document.getElementById('result');
+        question.textContent = first_word;
+
+        form_sub.addEventListener('submit',(e)=>{
+            e.preventDefault();
+
+            if(input_result.value[0] === question.textContent[question.textContent.length-1]){
+                result.textContent = '정답'
+                question.textContent = input_result.value;
+                input_result.value = ''
+            }else{
+                result.textContent = '땡~!';
+                input_result.value = '';
+            }
+        })
+
+
+    </script>
+</body>
+</html>

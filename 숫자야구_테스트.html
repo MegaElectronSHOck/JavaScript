@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1></h1>
+    <form >
+        <input type="text" maxLength=4>
+        <input type='submit' />
+    </form>
+
+    <ul></ul>
+    <script>
+        let result = document.querySelector('h1');
+        let form_sub = document.getElementsByTagName('form')[0];
+        let input_number = form_sub.children[0];
+        let scores = document.getElementsByTagName('ul')[0];
+        let get_number;
+        let count = 0;
+        let result_text = '';
+
+        function getNumber(){
+            let candidate = Array(9).fill().map((p,v)=>v+1);
+            
+            let array = [];
+            
+            while(array.length < 4 ){
+                let chosen = candidate.splice(Math.floor(Math.random()*candidate.length),1)[0]
+                array.push(chosen)
+            }
+            input_number.value = '';
+            input_number.focus();
+            result_text = '';
+            scores.innerHTML = result_text;
+            get_number = array;
+            count = 0;
+
+            console.log(get_number)
+        }
+       
+        getNumber()
+     
+        form_sub.addEventListener('submit',(e)=>{
+            e.preventDefault();
+            if(input_number.value === get_number.join('')){
+                result.textContent = '정답~!';
+                input_number.value = '';
+                input_number.focus();
+
+                getNumber();
+            }else{
+                if(count > 9){
+                    result.textContent = '10회이상 실패하여 아웃입니다.'
+
+                    getNumber();
+                }else{
+                    count += 1;
+                    let strike = 0;
+                    let ball = 0;
+                    let input_number_array = input_number.value.split('')
+                    for(let i = 0; i < 4; i++){
+                        if(Number(input_number_array[i]) === get_number[i]){
+                            strike += 1;
+                        }else if(get_number.includes(Number(input_number_array[i]))){
+                            ball += 1;
+                            
+                        }
+                    }
+
+                    result_text += '<li><div>'+ count +' : '+ input_number.value+'</div><div>'+strike+' 스트라이크 '+ball+' 볼입니다.</div></li>'
+                    
+                    scores.innerHTML = result_text;
+                    input_number.value= '';
+                    input_number.focus();
+                    
+                }
+            }
+          
+        })
+    </script>
+</body>
+</html>

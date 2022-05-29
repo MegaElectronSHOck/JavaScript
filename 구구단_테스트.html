@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id='question'></div>
+    <form>
+        <input type='number' />
+        <input type='submit' />
+    </form>
+    <div id='result'></div>
+
+    <script>
+        let question = document.getElementById('question');
+        let form_sub = document.getElementsByTagName('form')[0];
+        let input_result = document.getElementsByTagName('input')[0];
+
+        function question_input(){
+            
+        }
+        let number_1 = Math.ceil(Math.random()*9);
+        let number_2 = Math.ceil(Math.random()*9);
+        let multiple = number_1 * number_2;
+
+        
+        let result = document.getElementById('result')
+
+
+        question.textContent = number_1 + '곱하기' + number_2 + '는?';
+
+        form_sub.addEventListener('submit',(e)=>{
+            e.preventDefault();
+
+            if(Number(input_result.value) === multiple){
+                result.textContent = '정답';
+                number_1 = Math.ceil(Math.random()*9);
+                number_2 = Math.ceil(Math.random()*9);
+                multiple = number_1 * number_2;
+
+                question.textContent = number_1 + '곱하기' + number_2 + '는?';
+                input_result.value = '';
+
+            }else{
+                result.textContent = '땡~!'
+                input_result.value = '';
+            }
+
+        })
+    </script>
+</body>
+</html>

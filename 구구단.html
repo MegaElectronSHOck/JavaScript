@@ -1,0 +1,42 @@
+<html>
+    <head></head>
+    <body>
+        <div id='question'></div>
+        <form>
+        <input type='number'/> <input type='submit' value='곱하기'/>
+        </form>
+        <div id='result'></div>
+        <script>
+            var number_1 = Math.ceil(Math.random()*9);
+            var number_2 = Math.ceil(Math.random()*9);
+            var multiple = number_1 * number_2;
+
+            var question = document.getElementById('question');
+            var form_sub = document.getElementsByTagName('form')[0]
+            var input_result = document.getElementsByTagName('input')[0];
+            var result = document.getElementById('result')
+            
+            question.textContent = `${number_1} 곱하기 ${number_2} 는?`
+
+            form_sub.addEventListener('submit', (e)=>{
+                e.preventDefault()
+                
+                if(multiple === Number(input_result.value)){
+                    result.textContent = '딩동댕';
+                    number_1 = Math.ceil(Math.random()*9);
+                    number_2 = Math.ceil(Math.random()*9);
+                    multiple = number_1 * number_2;
+                    question.textContent = `${number_1} 곱하기 ${number_2} 는?`
+                    input_result.value=''
+                }else{
+                    result.textContent = '땡~!'
+                    input_result.value=''
+                }
+            })
+
+
+
+
+        </script>
+    </body>
+</html>
